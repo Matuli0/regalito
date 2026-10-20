@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ola</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Dancing+Script:wght@600;700&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --w:min(44vw,26rem,calc((100dvh - 9rem)/1.4)); 
+  --h:calc(var(--w)*1.4);
+  --paper:#f3f6fb; --ink:#34506e; --accent:#3f6fa3; --tint:#8fb8e3;
+  --script:'Dancing Script',cursive; --hand:'Caveat',cursive; --sans:'Nunito',system-ui,sans-serif;
+  --tex:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .45 0 0 0 0 .6 .15 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:var(--sans);color:var(--ink);overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.6rem;
+  background:radial-gradient(circle at 15% 20%,#dcecff,transparent 45%),radial-gradient(circle at 85% 80%,#e3e8fb,transparent 45%),linear-gradient(160deg,#eef6ff,#d6e6fa)}
+
+
+.shift{width:var(--w);height:var(--h);transform:translateX(calc(var(--w)/2));transition:transform 1.1s ease;filter:drop-shadow(0 1em 1.2em rgba(30,60,100,.28))}
+.shift.closed{transform:none}
+.book{position:relative;width:100%;height:100%;perspective:2400px;perspective-origin:0 50%}
+.leaf{position:absolute;inset:0;transform-origin:left center;transform-style:preserve-3d;transition:transform 1.1s cubic-bezier(.6,.05,.25,1)}
+.leaf.flipped{transform:rotateY(-180deg)}
+.face{position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  font-size:max(8px,calc(var(--w)/21));padding:2.2em 1.8em;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  background-color:var(--paper);background-image:var(--tex)}
+.front{border-radius:0 .6em .6em 0}
+.back{transform:rotateY(180deg);border-radius:.6em 0 0 .6em}
+
+.front::after,.back::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to right,rgba(30,55,90,.2),transparent 12%)}
+.back::after{background:linear-gradient(to left,rgba(30,55,90,.2),transparent 12%)}
+
+.edge{position:absolute;top:0;bottom:0;width:15%;z-index:2;cursor:pointer;transition:background .3s}
+.front .edge{right:0}.back .edge{left:0}
+.front .edge:hover{background:linear-gradient(to left,rgba(63,111,163,.2),transparent)}
+.back .edge:hover{background:linear-gradient(to right,rgba(63,111,163,.2),transparent)}
+.edge.full{width:100%}
+
+
+h2{font:700 2em/1.1 var(--script);color:var(--accent);margin-bottom:.5em}
+p{font-size:.95em;line-height:1.7;max-width:20em}
+.sign{font:1.5em var(--hand);color:var(--accent);margin-top:1em}
+.heart{color:var(--tint);font-size:1.4em;margin:.6em 0 0}
+.no{position:absolute;bottom:1.2em;font:1em var(--hand);opacity:.6}
+.polaroid{position:relative;width:82%;background:#fff;padding:.7em .7em 2.8em;box-shadow:0 .3em .9em rgba(30,55,90,.22);transform:rotate(var(--r,-3deg))}
+.polaroid::before{content:"";position:absolute;top:-.9em;left:32%;width:36%;height:1.6em;background:rgba(188,214,240,.85);transform:rotate(-4deg)}
+.photo{position:relative;aspect-ratio:1;display:grid;place-items:center;overflow:hidden;color:var(--accent);font:1.3em var(--hand);background:linear-gradient(135deg,#d6e6fa,#cfd8f5)}
+.photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+
+.cover{background:linear-gradient(145deg,#6a9bd1,#34609a);color:#f7fbff;box-shadow:inset .6em 0 .8em -.4em rgba(20,40,80,.4)}
+.cover::before{content:"";position:absolute;inset:1.1em;border:.12em solid rgba(247,251,255,.7);border-radius:.4em;pointer-events:none}
+.cover h1{font:700 2.9em/1.05 var(--script);text-shadow:0 .05em .15em rgba(20,40,90,.35);margin-bottom:.4em}
+.cover p{font-size:1em}
+.cover .heart{color:#f7fbff}
+
+
+.letter{align-items:stretch;text-align:left;padding:2.2em 1.7em 3em}
+.letter p{max-width:none;font-size:.95em;line-height:1.65}
+.letter p+p{margin-top:.8em}
+.letter .sign{text-align:right}
+.poem h2{text-align:center}
+.poem p{font-size:.88em;font-style:italic;line-height:1.6}
+
+
+.nav{display:flex;align-items:center;gap:1rem}
+.nav button,#open{font:600 1rem var(--sans);color:#fff;background:var(--accent);border:0;border-radius:2rem;padding:.6rem 1.3rem;cursor:pointer;transition:transform .2s,opacity .2s}
+.nav button:hover:not(:disabled){transform:translateY(-2px)}
+.nav button:disabled{opacity:.35;cursor:default}
+#count{font:1.3rem var(--hand);min-width:5.5rem;text-align:center}
+#mute{position:fixed;right:1rem;bottom:1rem;width:2.8rem;height:2.8rem;border:0;border-radius:50%;background:rgba(255,255,255,.7);font-size:1.2rem;cursor:pointer;opacity:.7;transition:opacity .2s}
+#mute:hover{opacity:1}
+button:focus-visible{outline:3px solid #22427a;outline-offset:3px}
+
+
+#intro{position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;padding:2rem;text-align:center;
+  background:radial-gradient(circle at 20% 25%,#dcecff,transparent 50%),linear-gradient(160deg,#d6e6fa,#e3e8fb);transition:opacity 1s,visibility 1s}
+#intro.hide{opacity:0;visibility:hidden;pointer-events:none}
+#intro h1{font:700 clamp(2.6rem,9vw,4.5rem)/1.05 var(--script);color:var(--accent)}
+#intro p{font-size:1.05rem}
+#open{font-size:1.15rem;padding:.9rem 2.2rem;animation:beat 1.8s ease-in-out infinite}
+@keyframes beat{50%{transform:scale(1.06)}}
+
+@media(max-width:700px){
+  :root{--w:min(86vw,calc((100dvh - 8rem)/1.4))}
+  .shift{transform:none}
+  .shift.l{transform:translateX(var(--w))}
+  .edge{width:28%}
+}
+@media(prefers-reduced-motion:reduce){.leaf,.shift,#open{transition-duration:.01s;animation:none}}
+</style>
+</head>
+<body>
+
+
+<div id="intro">
+  <h1> para ti</h1> 
+  <p>sube el volumen y abre.</p>
+  <button id="open">abrir</button>
+</div>
+
+<!-- CAMBIAR MÚSICA AQUÍ: pon tu archivo (ej. musica.mp3) en la misma carpeta que index.html -->
+<audio id="bgm" src="musica.mp3" loop preload="auto"></audio>
+<button id="mute" aria-label="Pausar música">🔊</button>
+
+<div class="shift closed">
+  <div class="book">
+
+    <!-- HOJA 1: portada (anverso) + página 2 (reverso) -->
+    <div class="leaf">
+      <div class="face front cover">
+        <h1>ola</h1> <!-- CAMBIAR TÍTULO AQUÍ -->
+        <p>t amo</p> <!-- CAMBIAR TEXTO AQUÍ -->
+        <div class="heart">♥</div>
+        <p style="margin-top:1.4em">20 · 10 · 2026</p> <!-- CAMBIAR FECHA AQUÍ -->
+        <div class="edge full" data-go="1" title="Abrir libro"></div>
+      </div>
+      <div class="face back">
+        <div class="polaroid" style="--r:-3deg">
+          <div class="photo"><img src="foto1.jpg" alt="Foto 1" onerror="this.remove()"></div> <!-- CAMBIAR FOTO AQUÍ -->
+        </div>
+        <span class="no">2</span>
+        <div class="edge" data-go="-1"></div>
+      </div>
+    </div>
+
+    
+    <div class="leaf">
+      <div class="face front letter">
+        <p>hola jeje primero q todo amor te quiero agredecer por pasar otro mes conmigo y aun q suene muy cliche el q tenga q agrecer eso lo hago especialmente pq realmente agradezco a la vida y al destino el haberte conocido</p> <!-- CAMBIAR TEXTO AQUÍ -->
+        <span class="no">3</span>
+        <div class="edge" data-go="1"></div>
+      </div>
+      <div class="face back letter">
+        <p>y mira q es bien difícil q eso haya pasado y mas q te enamoraras de mi eso m da a entender 2 cosas, q no soy tan feo como creo y q realmente q formemos esto es algo q solo el destino se encargo q pasara lo q lo hace algo realmente muy hermoso al menos para mi,</p> <!-- CAMBIAR TEXTO AQUÍ -->
+        <span class="no">4</span>
+        <div class="edge" data-go="-1"></div>
+      </div>
+    </div>
+
+    
+    <div class="leaf">
+      <div class="face front">
+        <div class="polaroid" style="--r:2.5deg">
+          <div class="photo"><img src="foto2.jpg" alt="Foto 2" onerror="this.remove()"></div> <!-- CAMBIAR FOTO AQUÍ -->
+        </div>
+        <span class="no">5</span>
+        <div class="edge" data-go="1"></div>
+      </div>
+      <div class="face back letter">
+        <p>eres mi rayo de sol todos los días desde q estamos juntos, tu presencia realmente es algo muy hermoso y q aprecio mucho, el poder hablar contigo dia a dia, q me cuentes tus cosas o q simplemente hablemos me hace muy feliz</p> <!-- CAMBIAR TEXTO AQUÍ -->
+        <span class="no">6</span>
+        <div class="edge" data-go="-1"></div>
+      </div>
+    </div>
+
+    
+    <div class="leaf">
+      <div class="face front letter">
+        <p>y bueno sinceramente a pesar de q no estes conmigo irl, siempre siento q te tengo conmigo, en cada canción q escucho, en algo bonito q me sale en el celular, hasta viendo un gato m acuerdo de ti y por eso siento q te tengo siempre conmigo y es algo que adoro mucho</p> <!-- CAMBIAR TEXTO AQUÍ -->
+        <span class="no">7</span>
+        <div class="edge" data-go="1"></div>
+      </div>
+      <div class="face back">
+        <div class="polaroid" style="--r:-2deg">
+          <div class="photo"><img src="foto3.jpg" alt="Foto 3" onerror="this.remove()"></div> 
+        </div>
+        <span class="no">8</span>
+        <div class="edge" data-go="-1"></div>
+      </div>
+    </div>
+
+    
+    <div class="leaf">
+      <div class="face front letter">
+        <p>bueno amor, mi bebe, mi mujer se q bueno ya tenemos algo consolidado pero no tiene nada de malo preguntártelo nuevamente y es q m gustaria preguntarte si a dia de hoy 20-10-2026 me permitirías seguir amándote, queriéndote, valorándote y también seguir conociéndote asi como lo hago dia a dia,</p> <!-- CAMBIAR TEXTO AQUÍ -->
+        <span class="no">9</span>
+        <div class="edge" data-go="1"></div>
+      </div>
+      <div class="face back letter">
+        <p>lo único que quiero en esta vida es estar contigo y claro si tu deseo es querer seguir estando conmigo prometo amarte, cuiadarte y valorarte todos los días q se me permita hacerlo</p> <!-- CAMBIAR TEXTO AQUÍ -->
+        <span class="no">10</span>
+        <div class="edge" data-go="-1"></div>
+      </div>
+    </div>
+
+    
+    <div class="leaf">
+      <div class="face front letter">
+        <p>y aun q pienses q te lo digo en broma realmente seria muy lindo para mi seguir estando contigo y bueno tener el compromiso de casarnos, te lo juro q es algo q deseo mucho pq me parece muy lindo y te lo juro q mi alma y corazon te aman y te adoran mucho</p> <!-- CAMBIAR TEXTO AQUÍ -->
+        <span class="no">11</span>
+        <div class="edge" data-go="1"></div>
+      </div>
+      <div class="face back">
+        <div class="polaroid" style="--r:3deg">
+          <div class="photo"><img src="foto4.jpg" alt="Foto 4" onerror="this.remove()"></div> 
+        </div>
+        <span class="no">12</span>
+        <div class="edge" data-go="-1"></div>
+      </div>
+    </div>
+
+    
+    <div class="leaf">
+      <div class="face front letter">
+        <p>tipo nunca me sentí asi con alguien, nunca sentí una atracción tan grande por una persona y por eso siempre dire q a mi consideración tu eres realmente el amor de mi vida jeje</p> <!-- CAMBIAR TEXTO AQUÍ -->
+        <span class="no">13</span>
+        <div class="edge" data-go="1"></div>
+      </div>
+      <div class="face back letter">
+        <p>bueno te amo mucho bebe gracias por todo lo q haces eres una mujer realmente extraordinaria y la mujer mas linda del mundo t amo t amo t amo hay q hacer llamada todas las noches xfavor.</p> <!-- CAMBIAR TEXTO AQUÍ -->
+        <span class="no">14</span>
+        <div class="edge" data-go="-1"></div>
+      </div>
+    </div>
+
+    
+    <div class="leaf">
+      <div class="face front letter poem">
+        <h2>para ti</h2> 
+        <p>Si pudiera pedir un deseo cada vez que cae la noche, pediría que tus ojos nunca me dejen de mirar, que tu risa sea siempre mi sonido favorito, y que tu corazón sea mi único hogar.</p>
+        <p>Tienes esa magia que calma mis días grises, esa forma tan linda de hacerme sentir bien. No importa cuántos caminos existan en esta vida, yo siempre te volvería a elegir a ti una y otra vez.</p>
+        
+        <span class="no">15</span>
+        <div class="edge" data-go="1"></div>
+      </div>
+      <div class="face back">
+        <div class="polaroid" style="--r:-2.5deg">
+          <div class="photo"><img src="foto5.jpg" alt="Foto 5" onerror="this.remove()"></div> 
+        </div>
+        <span class="no">16</span>
+        <div class="edge" data-go="-1"></div>
+      </div>
+    </div>
+
+    
+    <div class="leaf">
+      <div class="face front cover">
+        <h1>fin… por ahora jeje</h1> 
+        <p>feliz cumple mes, mi bebe</p> 
+        <div class="heart">♥</div>
+        <div class="edge" data-go="-1" style="left:0;right:auto"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="nav">
+  <button id="prev" aria-label="Página anterior">‹ Anterior</button>
+  <span id="count">Portada</span>
+  <button id="next" aria-label="Página siguiente">Siguiente ›</button>
+</div>
+
+<script>
+(function () {
+  var leaves = [].slice.call(document.querySelectorAll('.leaf'));
+  var N = leaves.length, flips = N - 1, cur = 0, side = 'R';
+  var shift = document.querySelector('.shift'), prev = document.getElementById('prev'),
+      next = document.getElementById('next'), count = document.getElementById('count'),
+      bgm = document.getElementById('bgm'), mute = document.getElementById('mute'),
+      single = window.matchMedia('(max-width:700px)');
+
+  
+  function restZ(i) { return leaves[i].classList.contains('flipped') ? i + 1 : N - i; }
+  leaves.forEach(function (l, i) { l.style.zIndex = N - i; });
+
+  function render() {
+    leaves.forEach(function (l, i) { l.classList.toggle('flipped', i < cur); });
+    shift.classList.toggle('closed', cur === 0);
+    shift.classList.toggle('l', single.matches && side === 'L' && cur > 0);
+    prev.disabled = cur === 0;
+    next.disabled = cur === flips && (!single.matches || side === 'R');
+    count.textContent = cur === 0 ? 'Portada' : cur === flips ? 'Final' : cur + ' / ' + (flips - 1);
+  }
+
+  function flip(d) {
+    var n = cur + d;
+    if (n < 0 || n > flips) return;
+    var i = d > 0 ? cur : n, leaf = leaves[i];
+    leaf.style.zIndex = 100;            
+    cur = n; render();
+    setTimeout(function () { leaf.style.zIndex = restZ(i); }, 550); 
+  }
+
+  
+  function step(d) {
+    if (!single.matches) { flip(d); return; }
+    if (d > 0) {
+      if (cur > 0 && side === 'L') { side = 'R'; render(); }
+      else if (cur < flips) { flip(1); side = 'L'; render(); }
+    } else if (cur > 0) {
+      if (side === 'R') { side = 'L'; render(); }
+      else { flip(-1); side = 'R'; render(); }
+    }
+  }
+
+  prev.onclick = function () { step(-1); };
+  next.onclick = function () { step(1); };
+  [].forEach.call(document.querySelectorAll('[data-go]'), function (el) {
+    el.addEventListener('click', function () { step(+el.dataset.go); });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') step(1);
+    if (e.key === 'ArrowLeft') step(-1);
+  });
+  var x0 = null;
+  document.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if (Math.abs(dx) > 60) step(dx < 0 ? 1 : -1);
+  });
+  single.addEventListener('change', function () { side = cur > 0 ? 'L' : 'R'; render(); });
+
+  
+  function sync() {
+    mute.textContent = bgm.paused ? '🔇' : '🔊';
+    mute.setAttribute('aria-label', bgm.paused ? 'Reproducir música' : 'Pausar música');
+  }
+  bgm.addEventListener('play', sync);
+  bgm.addEventListener('pause', sync);
+  document.getElementById('open').addEventListener('click', function () {
+    document.getElementById('intro').classList.add('hide');
+    bgm.volume = 0.6;
+    var p = bgm.play(); if (p && p.catch) p.catch(sync);
+  });
+  mute.addEventListener('click', function () {
+    if (bgm.paused) { var p = bgm.play(); if (p && p.catch) p.catch(sync); } else bgm.pause();
+  });
+
+  sync(); render();
+})();
+</script>
+</body>
+</html>
